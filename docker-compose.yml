@@ -1,0 +1,43 @@
+services:
+  dinkly-api:
+    build: ./backend
+    container_name: dinkly-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/var/www
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: dinkly
+      DB_USERNAME: dinkly
+      DB_PASSWORD: secret
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: sh -c "php artisan key:generate --force && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=8000"
+
+  mysql:
+    image: mysql:8.0
+    container_name: dinkly-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: dinkly
+      MYSQL_USER: dinkly
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: rootsecret
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql_data:

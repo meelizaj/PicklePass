@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Rounded Club Emblem Background -->
+  <rect width="64" height="64" rx="16" fill="#0c3324"/>
+  <rect x="2" y="2" width="60" height="60" rx="14" stroke="#1f7858" stroke-width="1.5" stroke-opacity="0.6"/>
+
+  <!-- Subtle Court Accent Arc -->
+  <path d="M12 52C20 40 44 40 52 52" stroke="#c6f135" stroke-width="1.5" stroke-dasharray="3 3" stroke-opacity="0.5"/>
+
+  <!-- Pickleball Paddle -->
+  <g transform="rotate(-25 30 32)">
+    <!-- Handle grip -->
+    <rect x="28" y="38" width="6" height="14" rx="2" fill="#d8faee" stroke="#124734" stroke-width="1.5"/>
+    <line x1="28" y1="42" x2="34" y2="42" stroke="#185e45" stroke-width="1"/>
+    <line x1="28" y1="46" x2="34" y2="46" stroke="#185e45" stroke-width="1"/>
+    <!-- Paddle Rim / Edge Guard -->
+    <rect x="20" y="12" width="22" height="28" rx="8" fill="#185e45" stroke="#4ec096" stroke-width="1.5"/>
+    <!-- Paddle Face Sweet Spot -->
+    <rect x="23" y="15" width="16" height="22" rx="5" fill="#0f4431"/>
+  </g>
+
+  <!-- Perforated Pickleball (Optic Lime) -->
+  <g transform="translate(38, 16)">
+    <circle cx="9" cy="9" r="9" fill="#c6f135"/>
+    <!-- Ball Perforation Holes -->
+    <circle cx="9" cy="9" r="1.6" fill="#0c3324"/>
+    <circle cx="5" cy="6.5" r="1.3" fill="#0c3324"/>
+    <circle cx="13" cy="6.5" r="1.3" fill="#0c3324"/>
+    <circle cx="5" cy="11.5" r="1.3" fill="#0c3324"/>
+    <circle cx="13" cy="11.5" r="1.3" fill="#0c3324"/>
+    <circle cx="9" cy="4" r="1.2" fill="#0c3324"/>
+    <circle cx="9" cy="14" r="1.2" fill="#0c3324"/>
+  </g>
+</svg>
