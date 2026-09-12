@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { getErrorMessage } from '@/lib/utils'
 import { format12H, timeSlotsBetween } from '@/lib/time'
 import { Button } from '@/components/ui/Button'
@@ -11,7 +11,7 @@ export interface CourtFormValues {
   address: string
   description: string
   price_per_hour: number
-  image_url: string
+  image: File | null
   open_time: string
   close_time: string
 }
@@ -26,23 +26,31 @@ interface CourtFormProps {
   submitLabel: string
   onSubmit: (values: CourtFormValues) => Promise<void>
   onCancel?: () => void
+  currentImage?: string | null
 }
 
-export function CourtForm({ initial, submitLabel, onSubmit, onCancel }: CourtFormProps) {
+export function CourtForm({ initial, submitLabel, onSubmit, onCancel, currentImage }: CourtFormProps) {
   const [form, setForm] = useState<CourtFormValues>({
     name: initial?.name ?? '',
     address: initial?.address ?? '',
     description: initial?.description ?? '',
     price_per_hour: initial?.price_per_hour ?? 0,
-    image_url: initial?.image_url ?? '',
+    image: initial?.image ?? null,
     open_time: initial?.open_time ?? '06:00',
     close_time: initial?.close_time ?? '21:00',
   })
+  const [preview, setPreview] = useState<string | null>(currentImage ?? null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   function set<K extends keyof CourtFormValues>(field: K, value: CourtFormValues[K]) {
     setForm((f) => ({ ...f, [field]: value }))
+  }
+
+  function handleImageChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null
+    setForm((f) => ({ ...f, image: file }))
+    setPreview(file ? URL.createObjectURL(file) : (currentImage ?? null))
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -86,12 +94,17 @@ export function CourtForm({ initial, submitLabel, onSubmit, onCancel }: CourtFor
         value={form.price_per_hour}
         onChange={(e) => set('price_per_hour', Number(e.target.value))}
       />
-      <Input
-        label="Image URL (optional)"
-        type="url"
-        value={form.image_url}
-        onChange={(e) => set('image_url', e.target.value)}
-      />
+      <div className="space-y-1.5">
+        <span className="block text-xs font-semibold uppercase tracking-wider text-slate-700">
+          Court photo (optional)
+        </span>
+        {preview && (
+          <div className="aspect-video w-full max-h-32 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+            <img src={preview} alt="Court photo preview" className="h-full w-full object-cover" />
+          </div>
+        )}
+        <Input label="Upload photo" type="file" accept="image/*" onChange={handleImageChange} />
+      </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <Select
           label="Opens at"
@@ -108,7 +121,7 @@ export function CourtForm({ initial, submitLabel, onSubmit, onCancel }: CourtFor
           onChange={(e) => set('close_time', e.target.value)}
         />
       </div>
-      <div className="flex justify-end gap-3 pt-2">
+      <div className="sticky -bottom-4 -mx-6 flex justify-end gap-3 border-t border-gray-100 bg-white px-6 py-4">
         {onCancel && (
           <Button type="button" variant="secondary" onClick={onCancel}>
             Cancel

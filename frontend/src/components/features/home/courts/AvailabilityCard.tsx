@@ -1,7 +1,6 @@
 import type { BookedRange } from '@/lib/types'
 import { addMinutes, format12H, parseTime, timeSlotsBetween } from '@/lib/time'
 import { cn } from '@/lib/utils'
-import { Spinner } from '@/components/ui/Spinner'
 
 interface AvailabilityCardProps {
   openTime: string
@@ -29,12 +28,7 @@ export function AvailabilityCard({ openTime, closeTime, booked, loading }: Avail
         </p>
       </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center gap-2 py-6 text-sm text-gray-400">
-          <Spinner size="sm" />
-          Checking availability…
-        </div>
-      ) : (
+      {loading ? null : (
         <>
           <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4 min-[420px]:grid-cols-5">
             {slots.map((slot) => {

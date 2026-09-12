@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useAuth } from '@/components/common/useAuth'
+import { useAuth } from '@/lib/useAuth'
 
 export function HeroSection() {
   const { user } = useAuth()

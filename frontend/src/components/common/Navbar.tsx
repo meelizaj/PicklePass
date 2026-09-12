@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { cn } from '@/lib/utils'
-import { useAuth } from './useAuth'
+import { useAuth } from '../../lib/useAuth'
 import { NotificationBell } from './NotificationBell'
 
 const ownerLinks = [

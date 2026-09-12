@@ -1,19 +1,20 @@
 import { useCallback, useEffect, useState } from 'react'
-import { CourtForm, type CourtFormValues } from '@/components/features/courts/CourtForm'
+import { CourtForm, type CourtFormValues } from '@/components/features/home/courts/CourtForm'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { Spinner } from '@/components/ui/Spinner'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Modal } from '@/components/ui/Modal'
-import { api } from '@/lib/api'
+import { api } from '@/lib/axios'
+import { useToast } from '@/lib/toastContext'
 import type { Court } from '@/lib/types'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, getErrorMessage } from '@/lib/utils'
 
 export function OwnerCourtsPage() {
   const [courts, setCourts] = useState<Court[]>([])
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [editingCourt, setEditingCourt] = useState<Court | null>(null)
+  const toast = useToast()
 
   const load = useCallback(() => {
     api
@@ -26,10 +27,21 @@ export function OwnerCourtsPage() {
   useEffect(load, [load])
 
   async function handleSubmit(values: CourtFormValues) {
+    const formData = new FormData()
+    formData.append('name', values.name)
+    formData.append('address', values.address)
+    formData.append('description', values.description)
+    formData.append('price_per_hour', String(values.price_per_hour))
+    formData.append('open_time', values.open_time)
+    formData.append('close_time', values.close_time)
+    if (values.image) formData.append('image', values.image)
+
     if (editingCourt) {
-      await api.put(`/courts/${editingCourt.id}`, values)
+      await api.put(`/courts/${editingCourt.id}`, formData)
+      toast.success('Court updated.')
     } else {
-      await api.post('/courts', values)
+      await api.post('/courts', formData)
+      toast.success('Court created.')
     }
     setModalOpen(false)
     setEditingCourt(null)
@@ -37,8 +49,13 @@ export function OwnerCourtsPage() {
   }
 
   async function handleDelete(id: number) {
-    await api.delete(`/courts/${id}`)
-    load()
+    try {
+      await api.delete(`/courts/${id}`)
+      toast.success('Court deleted.')
+      load()
+    } catch (err) {
+      toast.error(getErrorMessage(err))
+    }
   }
 
   function openEdit(court: Court) {
@@ -51,13 +68,7 @@ export function OwnerCourtsPage() {
     setModalOpen(true)
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-24">
-        <Spinner size="lg" />
-      </div>
-    )
-  }
+  if (loading) return null
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -127,6 +138,7 @@ export function OwnerCourtsPage() {
       >
         <CourtForm
           key={editingCourt?.id ?? 'new'}
+          currentImage={editingCourt?.image_url}
           initial={
             editingCourt
               ? {
@@ -134,7 +146,7 @@ export function OwnerCourtsPage() {
                   address: editingCourt.address,
                   description: editingCourt.description,
                   price_per_hour: Number(editingCourt.price_per_hour),
-                  image_url: editingCourt.image_url ?? '',
+                  image: null,
                   open_time: editingCourt.open_time ?? '06:00',
                   close_time: editingCourt.close_time ?? '21:00',
                 }

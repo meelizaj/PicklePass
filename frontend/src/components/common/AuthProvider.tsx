@@ -1,7 +1,7 @@
 import { useState, useEffect, type ReactNode } from 'react'
-import { api, clearAuth, onUnauthorized, storeToken, TOKEN_KEY } from '@/lib/api'
+import { api, clearAuth, onUnauthorized, storeToken, TOKEN_KEY } from '@/lib/axios'
 import type { AuthResponse, User } from '@/lib/types'
-import { AuthContext, type AuthContextType, type RegisterData, type UpdateProfileData } from './authContext'
+import { AuthContext, type AuthContextType, type RegisterData, type UpdateProfileData } from '../../lib/authContext'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)

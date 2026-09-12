@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getErrorMessage } from '@/lib/utils'
-import { useAuth } from '@/components/common/useAuth'
+import { useAuth } from '@/lib/useAuth'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 

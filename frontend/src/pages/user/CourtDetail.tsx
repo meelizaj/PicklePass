@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { BookingForm } from '@/components/features/courts/BookingForm'
-import { ReceiptModal } from '@/components/features/bookings/ReceiptModal'
+import { BookingForm } from '@/components/features/home/courts/BookingForm'
+import { ReceiptModal } from '@/components/features/home/courts/bookings/ReceiptModal'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { Spinner } from '@/components/ui/Spinner'
 import { Button } from '@/components/ui/Button'
-import { api } from '@/lib/api'
+import { api } from '@/lib/axios'
+import { useToast } from '@/lib/toastContext'
 import type { Booking, Court } from '@/lib/types'
 import { formatPrice } from '@/lib/utils'
-import { useAuth } from '@/components/common/useAuth'
+import { useAuth } from '@/lib/useAuth'
 
 export function CourtDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -19,6 +19,7 @@ export function CourtDetailPage() {
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [receipt, setReceipt] = useState<Booking | null>(null)
+  const toast = useToast()
 
   useEffect(() => {
     api
@@ -31,15 +32,10 @@ export function CourtDetailPage() {
   async function handleBook(data: { date: string; start_time: string; end_time: string; pax: number }) {
     const res = await api.post<Booking>('/bookings', { court_id: Number(id), ...data })
     setReceipt(res.data)
+    toast.success('Booking confirmed!')
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-24">
-        <Spinner size="lg" />
-      </div>
-    )
-  }
+  if (loading) return null
 
   if (notFound || !court) {
     return (

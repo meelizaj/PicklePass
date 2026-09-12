@@ -2,13 +2,15 @@ import { useState, type FormEvent } from 'react'
 import type { SkillLevel } from '@/lib/types'
 import { SKILL_LEVELS } from '@/lib/types'
 import { getErrorMessage } from '@/lib/utils'
-import { useAuth } from '@/components/common/useAuth'
+import { useAuth } from '@/lib/useAuth'
+import { useToast } from '@/lib/toastContext'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 
 export function ProfileForm({ onSaved }: { onSaved: () => void }) {
   const { user, updateProfile } = useAuth()
+  const toast = useToast()
   const [form, setForm] = useState({
     name: user?.name ?? '',
     email: user?.email ?? '',
@@ -32,6 +34,7 @@ export function ProfileForm({ onSaved }: { onSaved: () => void }) {
         password: form.password || undefined,
       })
       setMessage('Profile updated.')
+      toast.success('Profile updated.')
       setForm((f) => ({ ...f, password: '' }))
       onSaved()
     } catch (err) {

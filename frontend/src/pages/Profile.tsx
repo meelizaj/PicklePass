@@ -1,20 +1,22 @@
 import { useEffect, useState } from 'react'
 import { ProfileForm } from '@/components/features/profile/ProfileForm'
-import { BookingTable } from '@/components/features/bookings/BookingTable'
-import { ReceiptModal } from '@/components/features/bookings/ReceiptModal'
-import { useAuth } from '@/components/common/useAuth'
+import { BookingTable } from '@/components/features/home/courts/bookings/BookingTable'
+import { ReceiptModal } from '@/components/features/home/courts/bookings/ReceiptModal'
+import { useAuth } from '@/lib/useAuth'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { RoleBadge } from '@/components/ui/Badge'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { Spinner } from '@/components/ui/Spinner'
-import { api } from '@/lib/api'
+import { api } from '@/lib/axios'
+import { useToast } from '@/lib/toastContext'
 import type { Booking } from '@/lib/types'
+import { getErrorMessage } from '@/lib/utils'
 
 export function ProfilePage() {
   const { user } = useAuth()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [receipt, setReceipt] = useState<Booking | null>(null)
+  const toast = useToast()
 
   function loadBookings() {
     api
@@ -27,8 +29,13 @@ export function ProfilePage() {
   useEffect(loadBookings, [])
 
   async function handleCancel(id: number) {
-    await api.delete(`/bookings/${id}`)
-    setBookings((list) => list.filter((b) => b.id !== id))
+    try {
+      await api.delete(`/bookings/${id}`)
+      setBookings((list) => list.filter((b) => b.id !== id))
+      toast.success('Booking cancelled.')
+    } catch (err) {
+      toast.error(getErrorMessage(err))
+    }
   }
 
   if (!user) return null
@@ -54,11 +61,7 @@ export function ProfilePage() {
 
         <div>
           <h2 className="mb-4 text-xl font-bold text-gray-900">My bookings</h2>
-          {loading ? (
-            <div className="flex justify-center py-16">
-              <Spinner />
-            </div>
-          ) : bookings.length === 0 ? (
+          {loading ? null : bookings.length === 0 ? (
             <EmptyState title="No bookings yet" description="Book a court to see it here." />
           ) : (
             <BookingTable bookings={bookings} onCancel={handleCancel} onReceipt={setReceipt} />

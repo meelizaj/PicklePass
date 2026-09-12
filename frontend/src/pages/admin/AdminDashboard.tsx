@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Card } from '@/components/ui/Card'
-import { Spinner } from '@/components/ui/Spinner'
 import { RoleBadge, StatusBadge } from '@/components/ui/Badge'
-import { api } from '@/lib/api'
+import { api } from '@/lib/axios'
 import type { AdminDashboardData } from '@/lib/types'
 import { formatPrice } from '@/lib/utils'
 
@@ -29,13 +28,7 @@ export function AdminDashboardPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-24">
-        <Spinner size="lg" />
-      </div>
-    )
-  }
+  if (loading) return null
 
   const stats = data?.stats
   const bookings = data?.recent_bookings ?? []

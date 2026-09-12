@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { api } from '@/lib/api'
+import { api } from '@/lib/axios'
 import { cn } from '@/lib/utils'
 import type { AppNotification } from '@/lib/types'
 

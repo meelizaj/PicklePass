@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
-import { MatchCard } from '@/components/features/matches/MatchCard'
-import { MatchForm } from '@/components/features/matches/MatchForm'
-import { useAuth } from '@/components/common/useAuth'
+import { MatchCard } from '@/components/features/home/matches/MatchCard'
+import { MatchForm } from '@/components/features/home/matches/MatchForm'
+import { useAuth } from '@/lib/useAuth'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { Spinner } from '@/components/ui/Spinner'
-import { api } from '@/lib/api'
+import { api } from '@/lib/axios'
+import { useToast } from '@/lib/toastContext'
 import type { Court, MatchRequest } from '@/lib/types'
+import { getErrorMessage } from '@/lib/utils'
 
 export function MatchesPage() {
   const { user } = useAuth()
@@ -14,6 +15,7 @@ export function MatchesPage() {
   const [open, setOpen] = useState<MatchRequest[]>([])
   const [mine, setMine] = useState<MatchRequest[]>([])
   const [loading, setLoading] = useState(true)
+  const toast = useToast()
 
   const load = useCallback(() => {
     Promise.allSettled([
@@ -34,27 +36,36 @@ export function MatchesPage() {
     time: string | null
     notes: string | null
   }) {
-    await api.post<MatchRequest>('/match-requests', data)
-    load()
+    try {
+      await api.post<MatchRequest>('/match-requests', data)
+      toast.success('Match request posted.')
+      load()
+    } catch (err) {
+      toast.error(getErrorMessage(err))
+    }
   }
 
   async function handleJoin(id: number) {
-    await api.post<MatchRequest>(`/match-requests/${id}/join`)
-    load()
+    try {
+      await api.post<MatchRequest>(`/match-requests/${id}/join`)
+      toast.success('You joined the match.')
+      load()
+    } catch (err) {
+      toast.error(getErrorMessage(err))
+    }
   }
 
   async function handleRemove(id: number) {
-    await api.delete(`/match-requests/${id}`)
-    load()
+    try {
+      await api.delete(`/match-requests/${id}`)
+      toast.success('Match request removed.')
+      load()
+    } catch (err) {
+      toast.error(getErrorMessage(err))
+    }
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-24">
-        <Spinner size="lg" />
-      </div>
-    )
-  }
+  if (loading) return null
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">

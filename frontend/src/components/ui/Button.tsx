@@ -1,6 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { cn } from '@/lib/utils'
-import { Spinner } from './Spinner'
 
 type Variant = 'primary' | 'secondary' | 'danger' | 'outline'
 type Size = 'sm' | 'md' | 'lg'
@@ -51,7 +50,6 @@ export function Button({
       disabled={disabled || loading}
       {...props}
     >
-      {loading && <Spinner size="sm" />}
       {children}
     </button>
   )

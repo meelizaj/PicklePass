@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
-import { BookingTable } from '@/components/features/bookings/BookingTable'
+import { BookingTable } from '@/components/features/home/courts/bookings/BookingTable'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { Spinner } from '@/components/ui/Spinner'
-import { api } from '@/lib/api'
+import { api } from '@/lib/axios'
+import { useToast } from '@/lib/toastContext'
 import type { Booking } from '@/lib/types'
+import { getErrorMessage } from '@/lib/utils'
 
 export function OwnerBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
+  const toast = useToast()
 
   const load = useCallback(() => {
     api
@@ -20,22 +22,26 @@ export function OwnerBookingsPage() {
   useEffect(load, [load])
 
   async function handleCancel(id: number) {
-    await api.patch(`/bookings/${id}`, { status: 'cancelled' })
-    load()
+    try {
+      await api.patch(`/bookings/${id}`, { status: 'cancelled' })
+      toast.success('Booking cancelled.')
+      load()
+    } catch (err) {
+      toast.error(getErrorMessage(err))
+    }
   }
 
   async function handleDelete(id: number) {
-    await api.delete(`/bookings/${id}`)
-    load()
+    try {
+      await api.delete(`/bookings/${id}`)
+      toast.success('Booking removed.')
+      load()
+    } catch (err) {
+      toast.error(getErrorMessage(err))
+    }
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-24">
-        <Spinner size="lg" />
-      </div>
-    )
-  }
+  if (loading) return null
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">

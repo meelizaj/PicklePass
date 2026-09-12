@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { UserTable } from '@/components/features/admin/UserTable'
-import { Spinner } from '@/components/ui/Spinner'
-import { api } from '@/lib/api'
+import { api } from '@/lib/axios'
+import { useToast } from '@/lib/toastContext'
 import type { Role, User } from '@/lib/types'
+import { getErrorMessage } from '@/lib/utils'
 
 export function AdminOwnersPage() {
   const [owners, setOwners] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
+  const toast = useToast()
 
   const load = useCallback(() => {
     api
@@ -19,22 +21,26 @@ export function AdminOwnersPage() {
   useEffect(load, [load])
 
   async function handleRoleChange(id: number, role: Role) {
-    await api.patch(`/admin/users/${id}`, { role })
-    load()
+    try {
+      await api.patch(`/admin/users/${id}`, { role })
+      toast.success(role === 'owner' ? 'User promoted to owner.' : 'Owner access revoked.')
+      load()
+    } catch (err) {
+      toast.error(getErrorMessage(err))
+    }
   }
 
   async function handleDelete(id: number) {
-    await api.delete(`/admin/users/${id}`)
-    load()
+    try {
+      await api.delete(`/admin/users/${id}`)
+      toast.success('Owner account deleted.')
+      load()
+    } catch (err) {
+      toast.error(getErrorMessage(err))
+    }
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-24">
-        <Spinner size="lg" />
-      </div>
-    )
-  }
+  if (loading) return null
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
